@@ -514,3 +514,38 @@ func ValidateSendChatPresence(ctx context.Context, request domainSend.ChatPresen
 
 	return nil
 }
+
+func ValidateSendButtons(ctx context.Context, request domainSend.ButtonRequest) error {
+	err := validation.ValidateStructWithContext(ctx, &request,
+		validation.Field(&request.Phone, validation.Required),
+		validation.Field(&request.Message, validation.Required),
+		validation.Field(&request.Buttons, validation.Required, validation.Each(validation.Required)),
+	)
+
+	if err != nil {
+		return pkgError.ValidationError(err.Error())
+	}
+
+	if err := validatePhoneNumber(request.Phone); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateSendTemplate(ctx context.Context, request domainSend.TemplateRequest) error {
+	err := validation.ValidateStructWithContext(ctx, &request,
+		validation.Field(&request.Phone, validation.Required),
+		validation.Field(&request.Message, validation.Required),
+	)
+
+	if err != nil {
+		return pkgError.ValidationError(err.Error())
+	}
+
+	if err := validatePhoneNumber(request.Phone); err != nil {
+		return err
+	}
+
+	return nil
+}

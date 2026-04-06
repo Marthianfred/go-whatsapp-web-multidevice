@@ -24,6 +24,8 @@ type IInteractionSender interface {
 	SendLink(ctx context.Context, request LinkRequest) (response GenericResponse, err error)
 	SendLocation(ctx context.Context, request LocationRequest) (response GenericResponse, err error)
 	SendPoll(ctx context.Context, request PollRequest) (response GenericResponse, err error)
+	SendButtons(ctx context.Context, request ButtonRequest) (response GenericResponse, err error)
+	SendTemplate(ctx context.Context, request TemplateRequest) (response GenericResponse, err error)
 }
 
 // IPresenceSender handles presence-related operations

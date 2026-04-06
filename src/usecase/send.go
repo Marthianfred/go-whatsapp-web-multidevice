@@ -1818,3 +1818,99 @@ func (service serviceSend) getDefaultEphemeralExpiration(jid string) (expiration
 
 	return expiration
 }
+
+func (service serviceSend) SendButtons(ctx context.Context, request domainSend.ButtonRequest) (response domainSend.GenericResponse, err error) {
+	err = validations.ValidateSendButtons(ctx, request)
+	if err != nil {
+		return response, err
+	}
+
+	client := whatsapp.ClientFromContext(ctx)
+	if client == nil {
+		return response, pkgError.ErrWaCLI
+	}
+
+	dataWaRecipient, err := utils.ValidateJidWithLogin(client, request.Phone)
+	if err != nil {
+		return response, err
+	}
+
+	var buttons []*waE2E.ButtonsMessage_Button
+	for _, btn := range request.Buttons {
+		buttons = append(buttons, &waE2E.ButtonsMessage_Button{
+			ButtonID:   proto.String(btn.ButtonID),
+			ButtonText: &waE2E.ButtonsMessage_Button_ButtonText{DisplayText: proto.String(btn.ButtonText)},
+			Type:       waE2E.ButtonsMessage_Button_RESPONSE.Enum(),
+		})
+	}
+
+	msg := &waE2E.Message{
+		ButtonsMessage: &waE2E.ButtonsMessage{
+			ContentText: proto.String(request.Message),
+			Header:      &waE2E.ButtonsMessage_Text{Text: request.Title},
+			FooterText:  proto.String(request.Footer),
+			Buttons:     buttons,
+			HeaderType:  waE2E.ButtonsMessage_TEXT.Enum(),
+		},
+	}
+
+	if request.BaseRequest.Duration != nil && *request.BaseRequest.Duration > 0 {
+		msg.ButtonsMessage.ContextInfo = &waE2E.ContextInfo{
+			Expiration: proto.Uint32(uint32(*request.BaseRequest.Duration)),
+		}
+	}
+
+	ts, err := service.wrapSendMessage(ctx, client, dataWaRecipient, msg, request.Message)
+	if err != nil {
+		return response, err
+	}
+
+	response.MessageID = ts.ID
+	response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s)", request.Phone, ts.Timestamp.String())
+	return response, nil
+}
+
+func (service serviceSend) SendTemplate(ctx context.Context, request domainSend.TemplateRequest) (response domainSend.GenericResponse, err error) {
+	err = validations.ValidateSendTemplate(ctx, request)
+	if err != nil {
+		return response, err
+	}
+
+	client := whatsapp.ClientFromContext(ctx)
+	if client == nil {
+		return response, pkgError.ErrWaCLI
+	}
+
+	dataWaRecipient, err := utils.ValidateJidWithLogin(client, request.Phone)
+	if err != nil {
+		return response, err
+	}
+
+	msg := &waE2E.Message{
+		TemplateMessage: &waE2E.TemplateMessage{
+			HydratedTemplate: &waE2E.TemplateMessage_HydratedFourRowTemplate{
+				HydratedContentText: proto.String(request.Message),
+				HydratedFooterText:  proto.String(request.Footer),
+				Title: &waE2E.TemplateMessage_HydratedFourRowTemplate_HydratedTitleText{
+					HydratedTitleText: request.Title,
+				},
+				TemplateID: proto.String(request.TemplateID),
+			},
+		},
+	}
+
+	if request.BaseRequest.Duration != nil && *request.BaseRequest.Duration > 0 {
+		msg.TemplateMessage.ContextInfo = &waE2E.ContextInfo{
+			Expiration: proto.Uint32(uint32(*request.BaseRequest.Duration)),
+		}
+	}
+
+	ts, err := service.wrapSendMessage(ctx, client, dataWaRecipient, msg, request.Message)
+	if err != nil {
+		return response, err
+	}
+
+	response.MessageID = ts.ID
+	response.Status = fmt.Sprintf("Message sent to %s (server timestamp: %s)", request.Phone, ts.Timestamp.String())
+	return response, nil
+}
