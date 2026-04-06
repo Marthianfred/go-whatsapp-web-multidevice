@@ -10,7 +10,7 @@ services:
       dockerfile: ./docker/golang.Dockerfile
     restart: "on-failure"
     ports:
-      - "3081:3081"
+      - "3081"
     volumes:
       - whatsapp:/app/storages
     command:
