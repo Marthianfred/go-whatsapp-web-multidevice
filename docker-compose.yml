@@ -1,5 +1,5 @@
 services:
-  whatsapp_go:
+  whatsapp:
     logging:
       driver: "json-file"
       options:
