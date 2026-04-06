@@ -10,8 +10,17 @@ services:
       dockerfile: ./docker/golang.Dockerfile
     restart: "on-failure"
     ports:
-      - "3000:3000"
+      - "3081:3081"
     volumes:
-      # Persist WhatsApp + chat DBs; entrypoint chowns for gowauser (uid 20001, gid 20000) on start.
-      - ./storages:/app/storages
-      - ./statics:/app/statics
+      - whatsapp:/app/storages
+    command:
+      - rest
+      - --webhook="https://workflow.traigalo.online/webhook-test/32c9cb9b-760d-4e06-be90-63909c11cccf"
+      - --basic-auth=${WA_USER}:${WA_PASSWORD}
+      - --port=3081
+      - --debug=false
+      - --os=Chrome
+      - --account-validation=false
+
+volumes:
+  whatsapp:
