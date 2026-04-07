@@ -94,8 +94,10 @@
         <send-poll></send-poll>
         
         <send-presence></send-presence>
-        
         <send-chat-presence></send-chat-presence>
+
+        <send-buttons></send-buttons>
+        <send-template></send-template>
         <send-link></send-link>
     </div>
 
@@ -217,6 +219,8 @@
     import SendPoll from "{{ .AppBasePath }}/components/SendPoll.js";
     import SendPresence from "{{ .AppBasePath }}/components/SendPresence.js";
     import SendChatPresence from "{{ .AppBasePath }}/components/SendChatPresence.js";
+    import SendButtons from "{{ .AppBasePath }}/components/SendButtons.js";
+    import SendTemplate from "{{ .AppBasePath }}/components/SendTemplate.js";
     import MessageDelete from "{{ .AppBasePath }}/components/MessageDelete.js";
     import MessageUpdate from "{{ .AppBasePath }}/components/MessageUpdate.js";
     import MessageReact from "{{ .AppBasePath }}/components/MessageReact.js";
@@ -271,7 +275,7 @@
     Vue.createApp({
         components: {
             AppLogin, AppLoginWithCode, AppLogout, AppReconnect,
-            SendMessage, SendImage, SendFile, SendVideo, SendSticker, SendLink, SendContact, SendLocation, SendAudio, SendPoll, SendPresence, SendChatPresence,
+            SendMessage, SendImage, SendFile, SendVideo, SendSticker, SendLink, SendContact, SendLocation, SendAudio, SendPoll, SendPresence, SendChatPresence, SendButtons, SendTemplate,
             MessageDelete, MessageUpdate, MessageReact, MessageRevoke, MessageRead,
             GroupList, GroupCreate, GroupJoinWithLink, GroupInfoFromLink, GroupAddParticipants, GroupSetPhoto, GroupSetName, GroupSetLocked, GroupSetAnnounce, GroupSetTopic, GroupGetInviteLink, GroupInfo,
             NewsletterList,
